@@ -1,0 +1,70 @@
+DDP Week 4 Reproducible Pitch
+========================================================
+author: Jorgen Quaade
+date: August 17, 2017
+autosize: true
+
+Introduction
+========================================================
+
+This presentation pitches an app that can be used to get a prediction of the miles per gallon of an automobile given either a specific number of gross horsepower or a specific weight
+
+- The application was built with shiny
+- dataset used was the R builtin mtcars dataset
+- Linear regression modelling was used
+
+Source files for the shiny app can be found here:
+
+https://github.com/jorgenquaade/datasciencecoursera
+
+Prediction Model
+========================================================
+
+Linear regression modelling was used to predict the expected number of Miles per Gallon (mpg) based on either Gross Horsepower (hp) or Weight (wt). Example model code can be seen below
+
+```{r, echo=TRUE}
+model1 <- lm(mpg ~ hp, data = mtcars)
+```
+
+And the following code snippet was used to retrieve the input from the slider
+
+```{r, echo=TRUE, eval=FALSE}
+model1pred <- reactive({
+        hpInput <- input$slider1
+        predict(model1, newdata = data.frame(hp = hpInput))
+    })
+```
+
+The Server.R code to produce output
+========================================================
+
+A specific prediction number is output in the sidepanel underneath the sliders. The graphs are interactive and disply the measurements from the mtcars dataset as well as the regression line with a dot showing the prediction point. Example code snippet from server.R (not executable) below
+
+```{r, echo=TRUE, eval=FALSE}
+    
+    output$plot1 <- renderPlot({
+        hpInput <- input$slider1
+        plot(mtcars$hp, mtcars$mpg, xlab = "Horsepower",
+             ylab = "MPG", bty = "n", pch = 16,
+             xlim = c(0, 400), ylim = c(0, 50))
+        title(main = "Measured and predicted MPG based on Horsepower")
+        abline(model1, col = "blue", lwd = 2)
+ 
+        points(hpInput, model1pred(), col = "blue", pch = 16, cex = 2)
+```
+
+Example graph
+========================================================
+
+When 150 hp is chosen the following graph is shown
+
+```{r, echo=FALSE}
+model1 <- lm(mpg ~ hp, data = mtcars)
+hpInput <- 150
+plot(mtcars$hp, mtcars$mpg, xlab = "Horsepower",
+             ylab = "MPG", bty = "n", pch = 16,
+             xlim = c(0, 400), ylim = c(0, 50))
+        title(main = "Measured and predicted MPG based on Horsepower")
+        abline(model1, col = "blue", lwd = 2)
+        points(hpInput, predict(model1, newdata = data.frame(hp = hpInput)), col = "blue", pch = 16, cex = 2)
+```
